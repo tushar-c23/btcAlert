@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// KlineData represents the kline data from the Binance WebSocket
+// Data from binance
 type KlineData struct {
 	E         uint64 `json:"E"` // Event time
 	S         string `json:"s"` // Symbol
@@ -18,7 +18,6 @@ type KlineData struct {
 	EventType string `json:"e"`
 }
 
-// Kline represents the kline information within KlineData
 type Kline struct {
 	StartTime int64  `json:"t"` // Kline start time
 	CloseTime int64  `json:"T"` // Kline close time
@@ -90,7 +89,10 @@ func calcRSI(prices []float64, period int) float64 {
 	return rsi
 }
 
-func ws() {
+func indicatorCompute(
+	// ws *websocket.Conn,
+	notOnlyFinal bool,
+) {
 	// BTCUSDT 1m kline
 	const binanceWS = "wss://fstream.binance.com/ws/btcusdt@kline_1m"
 
@@ -116,35 +118,30 @@ func ws() {
 			continue
 		}
 
-		// if klineData.K.IsFinal {
-		closePrice := parseFloat(klineData.K.Close)
-		closePrices = append(closePrices, closePrice)
+		if notOnlyFinal || klineData.K.IsFinal {
+			closePrice := parseFloat(klineData.K.Close)
+			closePrices = append(closePrices, closePrice)
 
-		// We need at least 26 periods to calculate the MACD
-		if len(closePrices) >= 26 {
-			// Calculate 12-period and 26-period EMAs
-			ema12 := calcEMA(closePrices[len(closePrices)-12:], 12)
-			ema26 := calcEMA(closePrices[len(closePrices)-26:], 26)
+			// We need at least 26 periods to calculate the MACD
+			if len(closePrices) >= 26 {
+				ema12 := calcEMA(closePrices[len(closePrices)-12:], 12)
+				ema26 := calcEMA(closePrices[len(closePrices)-26:], 26)
 
-			// Calculate MACD: MACD = EMA12 - EMA26
-			macd := ema12 - ema26
+				macd := ema12 - ema26
 
-			rsi := calcRSI(closePrices, 14)
-
-			fmt.Printf("Time: %s\n", time.Unix(0, klineData.K.CloseTime*int64(time.Millisecond)))
-			fmt.Printf("MACD: %.6f | RSI: %.6f\n", macd, rsi)
-		} else {
-			if len(closePrices) >= 14 {
 				rsi := calcRSI(closePrices, 14)
 
 				fmt.Printf("Time: %s\n", time.Unix(0, klineData.K.CloseTime*int64(time.Millisecond)))
-				fmt.Printf("MACD: n/a | RSI: %.6f\n", rsi)
+				fmt.Printf("MACD: %.6f | RSI: %.6f\n", macd, rsi)
+
+				currentRSI = rsi
+				currentMACD = macd
+
 			} else {
 				fmt.Println("Data insufficient...")
 			}
+		} else {
+			fmt.Println("Non final kline candlestick...")
 		}
-		// } else {
-		// 	fmt.Println("Non final kline candlestick...")
-		// }
 	}
 }

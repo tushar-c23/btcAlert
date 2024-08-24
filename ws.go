@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -131,8 +130,8 @@ func indicatorCompute(
 
 				rsi := calcRSI(closePrices, 14)
 
-				fmt.Printf("Time: %s\n", time.Unix(0, klineData.K.CloseTime*int64(time.Millisecond)))
-				fmt.Printf("MACD: %.6f | RSI: %.6f\n", macd, rsi)
+				// fmt.Printf("Time: %s\n", time.Unix(0, klineData.K.CloseTime*int64(time.Millisecond)))
+				// fmt.Printf("MACD: %.6f | RSI: %.6f\n", macd, rsi)
 
 				currentRSI = rsi
 				currentMACD = macd

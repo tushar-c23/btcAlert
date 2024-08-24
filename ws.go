@@ -36,7 +36,6 @@ func parseFloat(s string) float64 {
 	return value
 }
 
-// Calculate and return array with ema values
 func calcEMA(prices []float64, period int) float64 {
 
 	k := 2.0 / (float64(period) + 1.0)
@@ -91,11 +90,10 @@ func calcRSI(prices []float64, period int) float64 {
 	return rsi
 }
 
-func main() {
-	// Binance WebSocket endpoint for BTCUSDT 1m kline
+func ws() {
+	// BTCUSDT 1m kline
 	const binanceWS = "wss://fstream.binance.com/ws/btcusdt@kline_1m"
 
-	// Connect to the WebSocket
 	c, _, err := websocket.DefaultDialer.Dial(binanceWS, nil)
 	if err != nil {
 		log.Fatal("Dial error:", err)

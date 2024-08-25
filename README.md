@@ -8,8 +8,8 @@ Basic server that connects with the Binance web socket to fetch kline data of BT
     ```JSON
     {
     "value":25.0,
-    "direction":"up"/"down",
-    "indicator":"RSI"/"MACD"
+    "direction":"up/down",
+    "indicator":"RSI/MACD"
     }
     ```
 - WEBSOCKET /ws : Websocket that streams the alerts with alert status.
